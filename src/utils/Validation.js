@@ -1,5 +1,5 @@
 export const loginValidation = (values) => {
-  console.log('test');
+  console.log('testmbc,jmkcj');
   let isvalid = true,
     errors = {};
   let checkEmail = /^[A-Za-z0-9]{3,}@[A-Za-z0-9]{3,}[.]{1}[A-Za-z]{2,6}$/;
