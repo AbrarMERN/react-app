@@ -14,6 +14,7 @@ export const loginValidation = (values) => {
 };
 
 export const registerValidation = (values) => {
+  console.log('okk');
   let isvalid = true,
     errors = {};
   let checkEmail = /^[A-Za-z0-9]{3,}@[A-Za-z0-9]{3,}[.]{1}[A-Za-z]{2,6}$/;
