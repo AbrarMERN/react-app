@@ -9,15 +9,17 @@ const LoginForm = () => {
     pswd: '',
   };
 
+  const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem('login-token')) {
+      // console.log('token', localStorage.getItem('login-token'));
       navigate('/userList');
     }
   }, []);
   const [loginData, setLoginData] = useState(initialState);
   const [resultMsg, setResultMsg] = useState('');
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+
   const onchangeHandle = (e) => {
     console.log(e.target.value);
     const { name, value } = e.target;
@@ -32,14 +34,14 @@ const LoginForm = () => {
       const { email, pswd } = loginData;
       let info = { email, pswd };
       const result = await axios.post(
-        'http://localhost:9000/userLogIn/logInRoute',
+        'http://localhost:9000/api/user/logInRoute',
         info
       );
       const { data } = result;
       const { msg, code, token } = data;
       if (result.data.code === 200) {
         localStorage.setItem('login-token', token);
-        alert('You Are Successfully Registered');
+        alert('You Are Successfully Login');
         navigate('/userList');
       }
       console.log(result);
@@ -59,9 +61,7 @@ const LoginForm = () => {
         <h1>{resultMsg}</h1>
         <form onSubmit={onSubmit}>
           <div class='mb-3 row'>
-            <label for='staticEmail' class='col-sm-2 col-form-label'>
-              Email
-            </label>
+            <label class='col-sm-2 col-form-label'>Email</label>
             <div class='col-sm-10'>
               <input
                 type='text'
@@ -77,9 +77,7 @@ const LoginForm = () => {
             </div>
           </div>
           <div class='mb-3 row'>
-            <label for='inputPassword' class='col-sm-2 col-form-label'>
-              Password
-            </label>
+            <label class='col-sm-2 col-form-label'>Password</label>
             <div class='col-sm-10'>
               <input
                 type='password'
@@ -96,6 +94,8 @@ const LoginForm = () => {
           </button>
         </form>
         <Link to='/userRegister'>Register</Link>
+        <br />
+        <Link to='/forgetPass'>Forget Password</Link>
       </div>
     </>
   );

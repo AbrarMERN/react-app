@@ -1,10 +1,15 @@
 import React from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 
 const ListUser = () => {
+  const mystyle = {
+    color: 'Black',
+    padding: '10px',
+    fontFamily: 'Arial',
+  };
   const navigate = useNavigate();
   const [activepage, setActivePage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -15,11 +20,7 @@ const ListUser = () => {
     setSkip(selected * limit);
     setActivePage(selected);
   };
-  const mystyle = {
-    color: 'Black',
-    padding: '10px',
-    fontFamily: 'Arial',
-  };
+
   console.log('count', count);
   const pageCount = Math.ceil(count / limit);
   console.log('page count', pageCount);
@@ -27,8 +28,14 @@ const ListUser = () => {
     console.log('limit', limit);
     console.log('skip', skip);
     console.log('i am trigger');
+    // const token=headers.Authorization.Bearer() token"}
+    const token = localStorage.getItem('login-token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
     const response = await axios.get(
-      `http://localhost:9000/userList/listUserRoute?limit=${limit}&skip=${skip}`
+      `http://localhost:9000/api/user/listUserRoute?limit=${limit}&skip=${skip}`,
+      config
     );
     const { count, data } = response.data;
     setUserData(data);
@@ -44,6 +51,10 @@ const ListUser = () => {
     getData(limit, skip);
   }, [limit, skip]);
 
+  // const editRecord = (e, data) => {
+  //   e.preventDefault();
+  //   alert(data);
+  // };
   return (
     <>
       <div class='container'>
@@ -55,16 +66,10 @@ const ListUser = () => {
                   <Link to='/addRecord'>Add Record</Link>
                 </li>
                 <li class='nav-item' style={mystyle}>
-                  <Link to='/editRecord'>Edit Record</Link>
-                </li>
-                <li class='nav-item' style={mystyle}>
-                  <Link to='/deleteRecord'>Delete Record</Link>
-                </li>
-                <li class='nav-item' style={mystyle}>
                   <Link to='searchRecord'>Search Record</Link>
                 </li>
                 <li class='nav-item' style={mystyle}>
-                  <Link to='forgetPassword'>Forget Password</Link>
+                  <Link to='resetPassword'>Reset Password</Link>
                 </li>
               </ul>
             </div>
@@ -87,6 +92,7 @@ const ListUser = () => {
               {userData &&
                 userData.map((el) => (
                   <tr>
+                    {console.log('el', el)}
                     <td>{el.fname}</td>
                     <td>{el.lname}</td>
                     <td>{el.mob}</td>
@@ -96,6 +102,18 @@ const ListUser = () => {
                     <td>{el.country}</td>
                     <td>{el.pin}</td>
                     <td>{el.email}</td>
+                    <td>
+                      <button>
+                        <Link to='/deleteRecord'>Delete Record</Link>
+                      </button>
+                    </td>
+                    <td>
+                      {/* <button onClick={(e) => editRecord(e, el)}> */}
+                      <Link to={`/editRecord?data=${el._id}`}>
+                        Edite Record
+                      </Link>
+                      {/* </button> */}
+                    </td>
                   </tr>
                 ))}
             </tbody>

@@ -1,7 +1,10 @@
 import React from 'react';
 import { useState } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerValidation } from '../../utils/Validation';
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const initialState = {
     uname: '',
     email: '',
@@ -9,20 +12,37 @@ const RegisterForm = () => {
     confPswd: '',
     mob: '',
   };
+
   const [registerData, setRegisterData] = useState(initialState);
   const [errors, setErrors] = useState({});
+
   const onchangeHandle = (e) => {
     console.log(e.target.value);
     const { name, value } = e.target;
     setRegisterData({ ...registerData, [name]: value });
   };
-  const onSubmit = (e) => {
-    e.preventDefault();
-    const { isvalid, errors } = registerValidation(registerData);
-    if (!isvalid) {
-      setErrors(errors);
-    } else {
-      let data = { registerData };
+
+  const onSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const { isvalid, errors } = registerValidation(registerData);
+      if (!isvalid) {
+        setErrors(errors);
+      } else {
+        const { uname, email, pswd, confPswd, mob } = registerData;
+        let regInfo = { uname, email, pswd, confPswd, mob };
+        const result = await axios.post(
+          'http://localhost:9000/api/user/signInRoute',
+          regInfo
+        );
+        console.log('Register Detail', result);
+        if (result.status === 200) {
+          // window.location.href = '/addRecord';
+          navigate('/addRecord');
+        }
+      }
+    } catch (err) {
+      alert(err.message);
     }
   };
   return (
