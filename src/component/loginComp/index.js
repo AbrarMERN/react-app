@@ -32,7 +32,7 @@ const LoginForm = () => {
       const { email, pswd } = loginData;
       let info = { email, pswd };
       const result = await axios.post(
-        'http://localhost:9000/userLogIn/logInRoute',
+        'http://localhost:9000/api/user/logInRoute',
         info
       );
       const { data } = result;

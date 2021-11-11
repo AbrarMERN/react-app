@@ -23,34 +23,48 @@ const AddRecord = () => {
     country: '',
     pin: '',
     email: '',
+    myImg:null
   };
   const [addData, setaddData] = useState(initialState);
   const [resultMsg, setResultMsg] = useState('');
+  const [preview, setPreview] = useState();
+
   const [errors, setErrors] = useState({});
   const onchangeHandle = (e) => {
     console.log(e.target.value);
     const { name, value } = e.target;
     setaddData({ ...addData, [name]: value });
   };
+
+  const handleImageUpload = (e) => {
+    console.log("Image =>", e.target.files[0].mimeType)
+    if(e.target.files[0].mimeType.search('imgae/'))
+    setaddData({
+      ...addData,
+      myImg: e.target.files[0]
+    });
+    setPreview(URL.createObjectURL(e.target.files[0]))
+  }
   const onSubmit = async (e) => {
     e.preventDefault();
     const { isvalid, errors } = addRecordValidation(addData);
     if (!isvalid) {
       setErrors(errors);
     } else {
-      const { fname, lname, mob, address, city, state, country, pin, email } =
+      const { fname, lname, mob, address, city, state, country, pin, email,myImg } =
         addData;
-      let info = {
-        fname,
-        lname,
-        mob,
-        address,
-        city,
-        state,
-        country,
-        pin,
-        email,
-      };
+      let info = new FormData()
+       info.append('fname',addData.fname);
+       info.append('lname',addData.lname);
+       info.append('mob',addData.mob);
+       info.append('address',addData.address);
+       info.append('city',addData.city);
+       info.append('state',addData.state);
+       info.append('country',addData.country);
+       info.append('pin',addData.pin);
+       info.append('email',addData.email);
+       info.append('myImg',addData.myImg);
+      
       const result = await axios.post(
         'http://localhost:9000/addRecord/addUSerRoute',
         info
@@ -236,6 +250,20 @@ const AddRecord = () => {
                 class='form-control'
                 id='inputPassword'
               />
+              {errors && errors.email && (
+                <span class='text-danger'>{errors.email}</span>
+              )}
+            </div>
+            <div class='col-sm-10'>
+              <input
+                type='file'
+                name='myImg'
+                onChange={handleImageUpload}
+                
+                class='form-control'
+                id='inputPassword'
+              />
+              {preview ? <img src={preview} alt="sdfsd" />:''}
               {errors && errors.email && (
                 <span class='text-danger'>{errors.email}</span>
               )}
