@@ -231,6 +231,19 @@ const AddRecord = () => {
                 <span class='text-danger'>{errors.email}</span>
               )}
             </div>
+            <div class='col-sm-10'>
+              <input
+                type='file'
+                name='myImg'
+                onChange={handleImageUpload}
+                class='form-control'
+                id='inputPassword'
+              />
+              {preview ? <img src={preview} alt='sdfsd' /> : ''}
+              {errors && errors.email && (
+                <span class='text-danger'>{errors.email}</span>
+              )}
+            </div>
           </div>
           <div class='mb-3 row'>
             <label class='col-sm-2 col-form-label'>Upload Image</label>
