@@ -42,11 +42,17 @@ const AddRecord = () => {
         myImg: e.target.files[0],
       });
       setPreview(URL.createObjectURL(e.target.files[0]));
+    } else {
+      alert('Please Choose Image File ');
     }
     console.log('Image In Data', addData);
   };
   const onSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('login-token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
     const { isvalid, errors } = addRecordValidation(addData);
     if (!isvalid) {
       setErrors(errors);
@@ -64,9 +70,13 @@ const AddRecord = () => {
       formData.append('myImg', addData.myImg);
       const result = await axios.post(
         'http://localhost:9000/api/user/addUSerRoute',
-        formData
+        formData,
+        config
       );
-      console.log('Add Data', result);
+      e.target.reset();
+      // toastr.success('Message was sent successfully!');
+      if (result.data.status === 200) {
+      }
     }
   };
   return (
@@ -233,6 +243,9 @@ const AddRecord = () => {
                 accept='.png, .jpg, .jpeg'
               />
               {/* {preview ? <img src={preview} alt='sdfsd' /> : ''} */}
+              {addData.myImg === null ? (
+                <span class='text-danger'>Please Choose Image</span>
+              ) : null}
             </div>
           </div>
           <button type='submit' className=' btn btn-danger'>

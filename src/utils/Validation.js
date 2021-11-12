@@ -1,15 +1,15 @@
 export const loginValidation = (values) => {
   let isvalid = true,
     errors = {};
-  let checkEmail = /^[A-Za-z0-9.]{3,}@[A-Za-z0-9]{3,}[.]{1}[A-Za-z]{2,6}$/;
+  // let checkEmail = /^[A-Za-z0-9.]{3,}@[A-Za-z0-9]{3,}[.]{1}[A-Za-z]{2,6}$/;
   if (!values.email) {
     isvalid = false;
     errors.email = 'Email Is Required';
   }
-  if (!checkEmail.test(values.email)) {
-    isvalid = false;
-    errors.email = 'Email Is Not Valid';
-  }
+  // if (!checkEmail.test(values.email)) {
+  //   isvalid = false;
+  //   errors.email = 'Email Is Not Valid';
+  // }
   return { isvalid, errors };
 };
 

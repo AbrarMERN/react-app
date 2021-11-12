@@ -16,6 +16,7 @@ const ListUser = () => {
   const [skip, setSkip] = useState(0);
   const [count, setCount] = useState(0);
   const [userData, setUserData] = useState('');
+  // const [searchData, setSearchData] = useState('');
   const handlePageClick = ({ selected }) => {
     setSkip(selected * limit);
     setActivePage(selected);
@@ -25,9 +26,9 @@ const ListUser = () => {
   const pageCount = Math.ceil(count / limit);
   console.log('page count', pageCount);
   const getData = async (limit, skip) => {
-    console.log('limit', limit);
-    console.log('skip', skip);
-    console.log('i am trigger');
+    // console.log('limit', limit);
+    // console.log('skip', skip);
+    // console.log('i am trigger');
     // const token=headers.Authorization.Bearer() token"}
     const token = localStorage.getItem('login-token');
     const config = {
@@ -50,11 +51,38 @@ const ListUser = () => {
     }
     getData(limit, skip);
   }, [limit, skip]);
-
-  // const editRecord = (e, data) => {
-  //   e.preventDefault();
-  //   alert(data);
-  // };
+  const logout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+  const deleteUser = async (id) => {
+    const token = localStorage.getItem('login-token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const delUser = await axios.delete(
+      `http://localhost:9000/api/user/deleteUserRoute/${id}`,
+      config
+    );
+    console.log(delUser);
+  };
+  const onchangeHandle = async (e) => {
+    // const { name, value } = e.target;
+    // setSearchData({ ...searchData, [name]: value });
+    const token = localStorage.getItem('login-token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const users = await axios.get(
+      `http://localhost:9000/api/user/searchUserRoute/${e.target.value}`,
+      config
+    );
+    if (users.data.code === 200) {
+      const { count, data } = users.data;
+      setUserData(data);
+      setCount(count);
+    }
+  };
   return (
     <>
       <div class='container'>
@@ -71,7 +99,24 @@ const ListUser = () => {
                 <li class='nav-item' style={mystyle}>
                   <Link to='resetPassword'>Reset Password</Link>
                 </li>
+                <li class='nav-item' style={mystyle}>
+                  <a href='#' onClick={logout}>
+                    LOGOUT
+                  </a>
+                </li>
               </ul>
+            </div>
+            <div class='mb-3 row'>
+              <label class='col-sm-2 col-form-label'>Search User</label>
+              <div class='col-sm-10'>
+                <input
+                  type='text'
+                  name='search'
+                  onChange={(e) => onchangeHandle(e)}
+                  class='form-control'
+                  id='inputPassword'
+                />
+              </div>
             </div>
           </nav>
           <table class='table'>
@@ -103,16 +148,15 @@ const ListUser = () => {
                     <td>{el.pin}</td>
                     <td>{el.email}</td>
                     <td>
-                      <button>
-                        <Link to='/deleteRecord'>Delete Record</Link>
+                      <button onClick={() => deleteUser(el._id)}>
+                        Delete User
+                        {/* <Link to={`/editRecord/${el._id}`}>Delete Record</Link> */}
                       </button>
                     </td>
                     <td>
-                      {/* <button onClick={(e) => editRecord(e, el)}> */}
-                      <Link to={`/editRecord?data=${el._id}`}>
-                        Edite Record
-                      </Link>
-                      {/* </button> */}
+                      <button>
+                        <Link to={`/editRecord/${el._id}`}>Edite Record</Link>
+                      </button>
                     </td>
                   </tr>
                 ))}

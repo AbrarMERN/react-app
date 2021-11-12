@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { editValidation } from '../../utils/Validation';
 const EditRecord = () => {
   let { data } = useParams();
-  console.log('sgdhghsdfh', data);
+  console.log('Data Id', data);
   const initialState = {
     fname: '',
     lname: '',
@@ -28,52 +28,92 @@ const EditRecord = () => {
     }
   }, []);
   //   const [getEditData, getEditData] = useState('');
-  const [editData, seteditData] = useState('');
+  const [getEditData, setGetEditData] = useState({});
+  // const [editData, seteditData] = useState('');
+  const [preview, setPreview] = useState();
   const [resultMsg, setResultMsg] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const onchangeHandle = (e) => {
     console.log(e.target.value);
     const { name, value } = e.target;
-    seteditData({ ...editData, [name]: value });
+    setGetEditData({ ...getEditData, [name]: value });
+  };
+  const handleImageUpload = (e) => {
+    console.log('Image =>', e.target.files[0]);
+    if (e.target.files[0].type.search('imgae/')) {
+      setGetEditData({
+        ...getEditData,
+        myImg: e.target.files[0],
+      });
+      setPreview(URL.createObjectURL(e.target.files[0]));
+    } else {
+      alert('Please Choose Image File ');
+    }
+    console.log('Image In Data', getEditData);
   };
   const onSubmit = async (e) => {
     e.preventDefault();
-    const { isvalid, errors } = editValidation(editData);
+    const { isvalid, errors } = editValidation(getEditData);
     if (!isvalid) {
       setErrors(errors);
     } else {
+      console.log('submit Id', data);
+      const token = localStorage.getItem('login-token');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      console.log('tokennnnnnn', token);
       let formData = new FormData();
-      formData.append('fname', editData.fname);
-      formData.append('lname', editData.lname);
-      formData.append('mob', editData.mob);
-      formData.append('address', editData.address);
-      formData.append('city', editData.city);
-      formData.append('state', editData.state);
-      formData.append('country', editData.country);
-      formData.append('pin', editData.pin);
-      formData.append('email', editData.email);
-      formData.append('myImg', editData.myImg);
-      const result = await axios.get(
-        'http://localhost:9000/api/user/editUserRoute/',
-        formData
+      formData.append('fname', getEditData.fname);
+      formData.append('lname', getEditData.lname);
+      formData.append('mob', getEditData.mob);
+      formData.append('address', getEditData.address);
+      formData.append('city', getEditData.city);
+      formData.append('state', getEditData.state);
+      formData.append('country', getEditData.country);
+      formData.append('pin', getEditData.pin);
+      formData.append('email', getEditData.email);
+      formData.append('myImg', getEditData.myImg);
+      const result = await axios.put(
+        `http://localhost:9000/api/user/editUserRoute/${data}`,
+        formData,
+        config
+        // { data: data }
       );
+      if (result.data.code === 200) {
+        return alert(result.data.msg);
+      }
+      if (result.data.code === 400) {
+        return alert(result.data.msg);
+      }
     }
   };
   useEffect(() => {
-    getRecordById();
-  }, []);
-  alert(data);
-  const getRecordById = async () => {
+    if (data) {
+      getRecordById(data);
+    } else {
+      navigate('/userList');
+    }
+  }, [data]);
+  const getRecordById = async (id) => {
+    const token = localStorage.getItem('login-token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
     const result = await axios.get(
-      'http://localhost:9000/api/user/getUserByIdRoute'
+      `http://localhost:9000/api/user/getUserByIdRoute/${id}`,
+      config
     );
-    console.log('Get Result ', result);
+    console.log('Result of Get Id=>', result);
+    console.log('Only Result Data=>', result.data);
+    setGetEditData(result.data.data);
   };
   return (
     <>
       <div class='container col-md-4'>
-        <h1 class='text-warning'>User Login</h1>
+        {console.log({ getEditData })}
+        <h1 class='text-warning'>Update Your Record</h1>
         <h1>{resultMsg}</h1>
         <form onSubmit={onSubmit}>
           <div class='mb-3 row'>
@@ -83,11 +123,11 @@ const EditRecord = () => {
                 type='text'
                 name='fname'
                 onChange={onchangeHandle}
-                value={editData.fname}
+                value={getEditData.fname}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.fname && (
+              {errors && errors.fname && !getEditData.fname && (
                 <span class='text-danger'>{errors.fname}</span>
               )}
             </div>
@@ -100,11 +140,11 @@ const EditRecord = () => {
                 type='text'
                 name='lname'
                 onChange={onchangeHandle}
-                value={editData.lname}
+                value={getEditData.lname}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.lname && (
+              {errors && errors.lname && !getEditData.fname && (
                 <span class='text-danger'>{errors.lname}</span>
               )}
             </div>
@@ -117,11 +157,11 @@ const EditRecord = () => {
                 type='text'
                 name='mob'
                 onChange={onchangeHandle}
-                value={editData.mob}
+                value={getEditData.mob}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.mob && (
+              {errors && errors.mob && !getEditData.fname && (
                 <span class='text-danger'>{errors.mob}</span>
               )}
             </div>
@@ -134,11 +174,11 @@ const EditRecord = () => {
                 type='text'
                 name='address'
                 onChange={onchangeHandle}
-                value={editData.address}
+                value={getEditData.address}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.address && (
+              {errors && errors.address && !getEditData.fname && (
                 <span class='text-danger'>{errors.address}</span>
               )}
             </div>
@@ -151,11 +191,11 @@ const EditRecord = () => {
                 type='text'
                 name='city'
                 onChange={onchangeHandle}
-                value={editData.city}
+                value={getEditData.city}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.city && (
+              {errors && errors.city && !getEditData.fname && (
                 <span class='text-danger'>{errors.city}</span>
               )}
             </div>
@@ -168,11 +208,11 @@ const EditRecord = () => {
                 type='text'
                 name='state'
                 onChange={onchangeHandle}
-                value={editData.state}
+                value={getEditData.state}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.state && (
+              {errors && errors.state && !getEditData.fname && (
                 <span class='text-danger'>{errors.state}</span>
               )}
             </div>
@@ -185,11 +225,11 @@ const EditRecord = () => {
                 type='text'
                 name='country'
                 onChange={onchangeHandle}
-                value={editData.country}
-                placeholder='email@example.com'
+                value={getEditData.country}
+                placeholder='Country'
                 class='form-control'
               />
-              {errors && errors.country && (
+              {errors && errors.country && !getEditData.fname && (
                 <span class='text-danger'>{errors.country}</span>
               )}
             </div>
@@ -202,11 +242,11 @@ const EditRecord = () => {
                 type='text'
                 name='pin'
                 onChange={onchangeHandle}
-                value={editData.pin}
+                value={getEditData.pin}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.pin && (
+              {errors && errors.pin && !getEditData.fname && (
                 <span class='text-danger'>{errors.pin}</span>
               )}
             </div>
@@ -215,20 +255,37 @@ const EditRecord = () => {
             <label class='col-sm-2 col-form-label'>Email</label>
             <div class='col-sm-10'>
               <input
-                type='password'
+                type='text'
                 name='email'
                 onChange={onchangeHandle}
-                value={editData.email}
+                value={getEditData.email}
                 class='form-control'
                 id='inputPassword'
               />
-              {errors && errors.email && (
+              {errors && errors.email && !getEditData.fname && (
                 <span class='text-danger'>{errors.email}</span>
               )}
             </div>
           </div>
+
+          <div class='mb-3 row'>
+            <label class='col-sm-2 col-form-label'>Upload Image</label>
+            <div class='col-sm-10'>
+              <input
+                type='file'
+                name='myImg'
+                onChange={handleImageUpload}
+                class='form-control'
+                accept='.png, .jpg, .jpeg'
+              />
+              {/* {preview ? <img src={preview} alt='sdfsd' /> : ''} */}
+              {getEditData.myImg === null ? (
+                <span class='text-danger'>Please Choose Image</span>
+              ) : null}
+            </div>
+          </div>
           <button type='submit' class=' btn btn-danger'>
-            Login
+            Update
           </button>
         </form>
       </div>

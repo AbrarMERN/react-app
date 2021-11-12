@@ -32,7 +32,7 @@ const RegisterForm = () => {
         const { uname, email, pswd, confPswd, mob } = registerData;
         let regInfo = { uname, email, pswd, confPswd, mob };
         const result = await axios.post(
-          'http://localhost:9000/api/user/signInRoute',
+          'http://localhost:9000/api/user/signUpRoute',
           regInfo
         );
         console.log('Register Detail', result);

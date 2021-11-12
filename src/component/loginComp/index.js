@@ -31,8 +31,8 @@ const LoginForm = () => {
     if (!isvalid) {
       setErrors(errors);
     } else {
-      const { email, pswd } = loginData;
-      let info = { email, pswd };
+      const { email, pswd, uname } = loginData;
+      let info = { email, pswd, uname };
       const result = await axios.post(
         'http://localhost:9000/api/user/logInRoute',
         info

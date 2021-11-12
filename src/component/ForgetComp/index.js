@@ -26,18 +26,18 @@ const ForgetPass = () => {
   };
   const onSubmit = async (e) => {
     e.preventDefault();
-    const { isvalid, errors } = forgetValidation(forgetData);
-    if (!isvalid) {
-      setErrors(errors);
-    } else {
-      const { email } = forgetData;
-      let info = { email };
-      const result = await axios.post(
-        'http://localhost:9000/api/user/forgetPswdRoute',
-        info
-      );
-      console.log('result OF data', result);
-    }
+    // const { isvalid, errors } = forgetValidation(forgetData);
+    // if (!isvalid) {
+    //   setErrors(errors);
+    // //} else {
+    const { email } = forgetData;
+    let info = { email };
+    const result = await axios.post(
+      'http://localhost:9000/api/user/forgetPswdRoute',
+      info
+    );
+    console.log('result OF data', result);
+    //  }
   };
   return (
     <>
