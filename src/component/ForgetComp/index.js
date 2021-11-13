@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { forgetValidation } from '../../utils/Validation';
@@ -36,7 +37,12 @@ const ForgetPass = () => {
       'http://localhost:9000/api/user/forgetPswdRoute',
       info
     );
-    console.log('result OF data', result);
+    if (result.data.code === 301) {
+      toast.error(result.data.msg);
+    }
+    if (result.data.code === 200) {
+      toast.success(result.data.msg);
+    }
     //  }
   };
   return (

@@ -153,4 +153,21 @@ export const forgetValidation = (values) => {
     isvalid = false;
     errors.email = 'Email Is Not Valid';
   }
+  return { isvalid, errors };
+};
+export const resetValidation = (values) => {
+  let isvalid = true,
+    errors = {};
+  if (!values.pswd) {
+    isvalid = false;
+    errors.pswd = 'Password Is Required';
+  } else if (!values.confPswd) {
+    isvalid = false;
+    errors.confPswd = 'Confirm Password Is Required';
+  }
+  if (values.pswd !== values.confPswd) {
+    isvalid = false;
+    errors.confPswd = 'Password Does Not Match';
+  }
+  return { isvalid, errors };
 };

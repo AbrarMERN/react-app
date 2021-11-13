@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addRecordValidation } from '../../utils/Validation';
@@ -73,9 +74,16 @@ const AddRecord = () => {
         formData,
         config
       );
-      e.target.reset();
+      console.log('adasfjjh', result);
       // toastr.success('Message was sent successfully!');
       if (result.data.status === 200) {
+        navigate('/userList');
+        toast.success(result.data.msg);
+      }
+      if (result.data.code === 401) {
+        localStorage.clear();
+        navigate('/');
+        toast.error(result.data.msg);
       }
     }
   };
@@ -231,7 +239,7 @@ const AddRecord = () => {
                 <span class='text-danger'>{errors.email}</span>
               )}
             </div>
-            <div class='col-sm-10'>
+            {/* <div class='col-sm-10'>
               <input
                 type='file'
                 name='myImg'
@@ -243,7 +251,7 @@ const AddRecord = () => {
               {errors && errors.email && (
                 <span class='text-danger'>{errors.email}</span>
               )}
-            </div>
+            </div> */}
           </div>
           <div class='mb-3 row'>
             <label class='col-sm-2 col-form-label'>Upload Image</label>

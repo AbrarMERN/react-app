@@ -26,9 +26,9 @@ const ListUser = () => {
   const pageCount = Math.ceil(count / limit);
   console.log('page count', pageCount);
   const getData = async (limit, skip) => {
-    // console.log('limit', limit);
-    // console.log('skip', skip);
-    // console.log('i am trigger');
+    console.log('limit', limit);
+    console.log('skip', skip);
+    console.log('i am trigger');
     // const token=headers.Authorization.Bearer() token"}
     const token = localStorage.getItem('login-token');
     const config = {
@@ -157,7 +157,9 @@ const ListUser = () => {
                     </td>
                     <td>
                       <button>
-                        <Link to={`/editRecord/${el._id}`}>Edite Record</Link>
+                        <Link to={`/editRecord/${el.userid}`}>
+                          Edite Record
+                        </Link>
                       </button>
                     </td>
                   </tr>

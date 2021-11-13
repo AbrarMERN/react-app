@@ -1,32 +1,37 @@
 import React from 'react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import queryString from 'query-string';
 import { useNavigate, useParams } from 'react-router-dom';
 import { editValidation } from '../../utils/Validation';
+
+const initialState = {
+  fname: '',
+  lname: '',
+  mob: '',
+  address: '',
+  city: '',
+  state: '',
+  country: '',
+  pin: '',
+  email: '',
+  myImg: null,
+};
 const EditRecord = () => {
   let { data } = useParams();
   console.log('Data Id', data);
-  const initialState = {
-    fname: '',
-    lname: '',
-    mob: '',
-    address: '',
-    city: '',
-    state: '',
-    country: '',
-    pin: '',
-    email: '',
-    myImg: null,
-  };
 
   useEffect(() => {
-    if (localStorage.getItem('login-token')) {
-      navigate('/editRecord');
-    } else {
+    if (!localStorage.getItem('login-token')) {
       navigate('/');
     }
   }, []);
+  useEffect(() => {
+    if (data) {
+      getRecordById(data);
+    } else {
+      navigate('/userList');
+    }
+  }, [data]);
   //   const [getEditData, getEditData] = useState('');
   const [getEditData, setGetEditData] = useState({});
   // const [editData, seteditData] = useState('');
@@ -89,13 +94,7 @@ const EditRecord = () => {
       }
     }
   };
-  useEffect(() => {
-    if (data) {
-      getRecordById(data);
-    } else {
-      navigate('/userList');
-    }
-  }, [data]);
+
   const getRecordById = async (id) => {
     const token = localStorage.getItem('login-token');
     const config = {
@@ -117,7 +116,8 @@ const EditRecord = () => {
         <h1>{resultMsg}</h1>
         <form onSubmit={onSubmit}>
           <div class='mb-3 row'>
-            <label class='col-sm-2 col-form-label'>First Name</label>
+            <label class='col-sm-2 col-form-label'>Last Name</label>
+            {console.log(getEditData)}
             <div class='col-sm-10'>
               <input
                 type='text'
@@ -140,11 +140,11 @@ const EditRecord = () => {
                 type='text'
                 name='lname'
                 onChange={onchangeHandle}
-                value={getEditData.lname}
+                value={getEditData.lname && getEditData.lname}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.lname && !getEditData.fname && (
+              {errors && errors.lname && !getEditData.lname && (
                 <span class='text-danger'>{errors.lname}</span>
               )}
             </div>
@@ -157,11 +157,11 @@ const EditRecord = () => {
                 type='text'
                 name='mob'
                 onChange={onchangeHandle}
-                value={getEditData.mob}
+                value={getEditData.mob && getEditData.mob}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.mob && !getEditData.fname && (
+              {errors && errors.mob && !getEditData.mob && (
                 <span class='text-danger'>{errors.mob}</span>
               )}
             </div>
@@ -174,11 +174,11 @@ const EditRecord = () => {
                 type='text'
                 name='address'
                 onChange={onchangeHandle}
-                value={getEditData.address}
+                value={getEditData.address && getEditData.address}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.address && !getEditData.fname && (
+              {errors && errors.address && !getEditData.address && (
                 <span class='text-danger'>{errors.address}</span>
               )}
             </div>
@@ -191,11 +191,11 @@ const EditRecord = () => {
                 type='text'
                 name='city'
                 onChange={onchangeHandle}
-                value={getEditData.city}
+                value={getEditData.city && getEditData.city}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.city && !getEditData.fname && (
+              {errors && errors.city && !getEditData.city && (
                 <span class='text-danger'>{errors.city}</span>
               )}
             </div>
@@ -208,11 +208,11 @@ const EditRecord = () => {
                 type='text'
                 name='state'
                 onChange={onchangeHandle}
-                value={getEditData.state}
+                value={getEditData.state && getEditData.state}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.state && !getEditData.fname && (
+              {errors && errors.state && !getEditData.state && (
                 <span class='text-danger'>{errors.state}</span>
               )}
             </div>
@@ -225,11 +225,11 @@ const EditRecord = () => {
                 type='text'
                 name='country'
                 onChange={onchangeHandle}
-                value={getEditData.country}
+                value={getEditData.country && getEditData.country}
                 placeholder='Country'
                 class='form-control'
               />
-              {errors && errors.country && !getEditData.fname && (
+              {errors && errors.country && !getEditData.country && (
                 <span class='text-danger'>{errors.country}</span>
               )}
             </div>
@@ -242,11 +242,11 @@ const EditRecord = () => {
                 type='text'
                 name='pin'
                 onChange={onchangeHandle}
-                value={getEditData.pin}
+                value={getEditData.pin && getEditData.pin}
                 placeholder='email@example.com'
                 class='form-control'
               />
-              {errors && errors.pin && !getEditData.fname && (
+              {errors && errors.pin && !getEditData.pin && (
                 <span class='text-danger'>{errors.pin}</span>
               )}
             </div>
@@ -258,11 +258,11 @@ const EditRecord = () => {
                 type='text'
                 name='email'
                 onChange={onchangeHandle}
-                value={getEditData.email}
+                value={getEditData.email && getEditData.email}
                 class='form-control'
                 id='inputPassword'
               />
-              {errors && errors.email && !getEditData.fname && (
+              {errors && errors.email && !getEditData.email && (
                 <span class='text-danger'>{errors.email}</span>
               )}
             </div>
