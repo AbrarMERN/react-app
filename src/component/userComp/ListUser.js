@@ -51,10 +51,13 @@ const ListUser = () => {
     }
     getData(limit, skip);
   }, [limit, skip]);
+  //Start Log Out Function
   const logout = () => {
     localStorage.clear();
     navigate('/');
   };
+
+  //Start Delete User Function
   const deleteUser = async (id) => {
     const token = localStorage.getItem('login-token');
     const config = {
@@ -66,9 +69,8 @@ const ListUser = () => {
     );
     console.log(delUser);
   };
+  //start Search User Data function
   const onchangeHandle = async (e) => {
-    // const { name, value } = e.target;
-    // setSearchData({ ...searchData, [name]: value });
     const token = localStorage.getItem('login-token');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
