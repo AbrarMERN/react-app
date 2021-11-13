@@ -1,52 +1,53 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { loginValidation } from '../../utils/Validation';
-const LoginForm = () => {
+import { resetValidation } from '../../utils/Validation';
+const ResetPass = () => {
   const initialState = {
-    email: '',
     pswd: '',
+    confPswd: '',
   };
-
+  let query = window.location.search;
+  //   let item = part.split('=');
+  //   resultval[item[0]] = decodeURIComponent(item[1]);
+  //   const { key } = useParams();
   const navigate = useNavigate();
-  useEffect(() => {
-    if (localStorage.getItem('login-token')) {
-      // console.log('token', localStorage.getItem('login-token'));
-      navigate('/userList');
-    }
-  }, []);
-  const [loginData, setLoginData] = useState(initialState);
+  //   useEffect(() => {
+  //     if (localStorage.getItem('login-token')) {
+  //       // console.log('token', localStorage.getItem('login-token'));
+  //       navigate('/userList');
+  //     }
+  //   }, []);
+  const [resetData, setResetData] = useState(initialState);
   const [resultMsg, setResultMsg] = useState('');
   const [errors, setErrors] = useState({});
 
   const onchangeHandle = (e) => {
     console.log(e.target.value);
     const { name, value } = e.target;
-    setLoginData({ ...loginData, [name]: value });
+    setResetData({ ...resetData, [name]: value });
   };
+  const { key } = useParams();
   const onSubmit = async (e) => {
     e.preventDefault();
     // toast.success('How Are You Friend');
-    const { isvalid, errors } = loginValidation(loginData);
+    const { isvalid, errors } = resetValidation(resetData);
     if (!isvalid) {
       setErrors(errors);
     } else {
-      const { email, pswd, uname } = loginData;
-      let info = { email, pswd, uname };
+      const { pswd, confPswd } = resetData;
+      let info = { pswd, confPswd };
       const result = await axios.post(
-        'http://localhost:9000/api/user/logInRoute',
+        `http://localhost:9000/api/user/resetPswdRoute/${key}`,
         info
       );
-      const { data } = result;
-      const { msg, code, token } = data;
       if (result.data.code === 200) {
-        localStorage.setItem('login-token', token);
         toast.success(result.data.msg);
-        navigate('/userList');
+        navigate('/');
       }
-      console.log(result);
+      console.log('Result sdkhsdfhjh', result);
       setResultMsg(result.data.msg);
       if (result.data.code === 301) {
         toast.error(result.data.msg);
@@ -54,7 +55,7 @@ const LoginForm = () => {
       if (result.data.code === 302) {
         toast.error(result.data.msg);
       }
-      if (result.data.code === 301) {
+      if (result.data.code === 303) {
         toast.error(result.data.msg);
       }
     }
@@ -62,25 +63,9 @@ const LoginForm = () => {
   return (
     <>
       <div class='container col-md-4'>
-        <h1 class='text-warning'>User Login</h1>
+        <h1 class='text-warning'>Reset Password</h1>
         <h1>{resultMsg}</h1>
         <form onSubmit={onSubmit}>
-          <div class='mb-3 row'>
-            <label class='col-sm-2 col-form-label'>Email</label>
-            <div class='col-sm-10'>
-              <input
-                type='text'
-                name='email'
-                onChange={onchangeHandle}
-                value={loginData.email}
-                placeholder='email@example.com'
-                class='form-control'
-              />
-              {errors && errors.email && (
-                <span class='text-danger'>{errors.email}</span>
-              )}
-            </div>
-          </div>
           <div class='mb-3 row'>
             <label class='col-sm-2 col-form-label'>Password</label>
             <div class='col-sm-10'>
@@ -88,21 +73,38 @@ const LoginForm = () => {
                 type='password'
                 name='pswd'
                 onChange={onchangeHandle}
-                value={loginData.pswd}
+                value={resetData.pswd}
                 class='form-control'
                 id='inputPassword'
               />
+              {errors && errors.pswd && (
+                <span class='text-danger'>{errors.pswd}</span>
+              )}
+            </div>
+          </div>
+
+          <div class='mb-3 row'>
+            <label class='col-sm-2 col-form-label'>ConFirm Password</label>
+            <div class='col-sm-10'>
+              <input
+                type='password'
+                name='confPswd'
+                onChange={onchangeHandle}
+                value={resetData.confPswd}
+                class='form-control'
+                id='inputPassword'
+              />
+              {errors && errors.confPswd && (
+                <span class='text-danger'>{errors.confPswd}</span>
+              )}
             </div>
           </div>
           <button type='submit' class=' btn btn-danger'>
-            Login
+            Reset Password
           </button>
         </form>
-        <Link to='/userRegister'>Register</Link>
-        <br />
-        <Link to='/forgetPass'>Forget Password</Link>
       </div>
     </>
   );
 };
-export default LoginForm;
+export default ResetPass;
