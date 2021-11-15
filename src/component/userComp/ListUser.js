@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { toast } from 'react-toastify';
 
 const ListUser = () => {
   const mystyle = {
@@ -10,25 +11,29 @@ const ListUser = () => {
     padding: '10px',
     fontFamily: 'Arial',
   };
+  const imgstyle={
+    width:'50px',
+    height:'50px',
+  }
   const navigate = useNavigate();
   const [activepage, setActivePage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [skip, setSkip] = useState(0);
   const [count, setCount] = useState(0);
-  const [userData, setUserData] = useState('');
+  const [userData, setUserData] = useState([]);
   // const [searchData, setSearchData] = useState('');
   const handlePageClick = ({ selected }) => {
     setSkip(selected * limit);
     setActivePage(selected);
   };
 
-  console.log('count', count);
+  // console.log('count', count);
   const pageCount = Math.ceil(count / limit);
-  console.log('page count', pageCount);
+  // console.log('page count', pageCount);
   const getData = async (limit, skip) => {
-    console.log('limit', limit);
-    console.log('skip', skip);
-    console.log('i am trigger');
+    // console.log('limit', limit);
+    // console.log('skip', skip);
+    // console.log('i am trigger');
     // const token=headers.Authorization.Bearer() token"}
     const token = localStorage.getItem('login-token');
     const config = {
@@ -44,16 +49,14 @@ const ListUser = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('login-token')) {
-      navigate('/userList');
-    } else {
-      navigate('/');
+    if (!localStorage.getItem('login-token')) {
+    return  navigate('/');
     }
     getData(limit, skip);
   }, [limit, skip]);
   //Start Log Out Function
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem('login-token');
     navigate('/');
   };
 
@@ -67,23 +70,37 @@ const ListUser = () => {
       `http://localhost:9000/api/user/deleteUserRoute/${id}`,
       config
     );
-    console.log(delUser);
+    if(delUser){
+      toast.success("Credential Is Deleted Successfully");
+      getData(limit, skip);
+    }
   };
   //start Search User Data function
-  const onchangeHandle = async (e) => {
+  const searchHandle = async (e) => {
+    if(e.target.value){
     const token = localStorage.getItem('login-token');
+    console.log("search Token",token);
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
+    console.log("search Token",config);
+
     const users = await axios.get(
       `http://localhost:9000/api/user/searchUserRoute/${e.target.value}`,
       config
     );
-    if (users.data.code === 200) {
-      const { count, data } = users.data;
-      setUserData(data);
-      setCount(count);
+    console.log("search users ",users);
+    if (users.data.code===200) {
+      const { result } = users.data;
+      setUserData(result);
+      setCount(result.length);
     }
+    if(users.data.code===401){
+      return toast.error(users.data.msg);
+    }
+  }else{
+    getData(limit, skip)
+  }
   };
   return (
     <>
@@ -95,15 +112,15 @@ const ListUser = () => {
                 <li class='nav-item' style={mystyle}>
                   <Link to='/addRecord'>Add Record</Link>
                 </li>
-                <li class='nav-item' style={mystyle}>
+                {/* <li class='nav-item' style={mystyle}>
                   <Link to='searchRecord'>Search Record</Link>
                 </li>
                 <li class='nav-item' style={mystyle}>
                   <Link to='resetPassword'>Reset Password</Link>
-                </li>
+                </li> */}
                 <li class='nav-item' style={mystyle}>
                   <a href='#' onClick={logout}>
-                    LOGOUT
+                    LogOut
                   </a>
                 </li>
               </ul>
@@ -114,7 +131,7 @@ const ListUser = () => {
                 <input
                   type='text'
                   name='search'
-                  onChange={(e) => onchangeHandle(e)}
+                  onChange={(e) => searchHandle(e)}
                   class='form-control'
                   id='inputPassword'
                 />
@@ -137,9 +154,9 @@ const ListUser = () => {
             </thead>
             <tbody>
               {userData &&
-                userData.map((el) => (
+                userData.length ?userData.map((el) => (
                   <tr>
-                    {console.log('el', el)}
+               
                     <td>{el.fname}</td>
                     <td>{el.lname}</td>
                     <td>{el.mob}</td>
@@ -149,6 +166,7 @@ const ListUser = () => {
                     <td>{el.country}</td>
                     <td>{el.pin}</td>
                     <td>{el.email}</td>
+                    {/* <td><img src={el.myImg} style={imgstyle}/></td> */}
                     <td>
                       <button onClick={() => deleteUser(el._id)}>
                         Delete User
@@ -157,13 +175,15 @@ const ListUser = () => {
                     </td>
                     <td>
                       <button>
-                        <Link to={`/editRecord/${el.userid}`}>
+                        <Link to={`/editRecord/${el._id}`}>
                           Edite Record
                         </Link>
                       </button>
                     </td>
                   </tr>
-                ))}
+                )):(
+                  <tr><td colspan={6}>No Data Found </td></tr>
+                )}
             </tbody>
           </table>
           <ReactPaginate

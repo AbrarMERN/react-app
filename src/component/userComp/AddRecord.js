@@ -8,11 +8,9 @@ import { addRecordValidation } from '../../utils/Validation';
 const AddRecord = () => {
   const navigate = useNavigate();
   useEffect(() => {
-    if (localStorage.getItem('login-token')) {
-      navigate('/addRecord');
-    } else {
+    if (!localStorage.getItem('login-token')) {
       navigate('/');
-    }
+    } 
   }, []);
   const initialState = {
     fname: '',
@@ -69,6 +67,19 @@ const AddRecord = () => {
       formData.append('pin', addData.pin);
       formData.append('email', addData.email);
       formData.append('myImg', addData.myImg);
+      // formData.append(
+      //   {fname:addData.fname},
+      //   {lname:addData.lname},
+      //   {mob:addData.mob},
+      //   {address:addData.address},
+      //   {city:addData.city},
+      //   {state:addData.state},
+      //   {country:addData.country},
+      //   {pin:addData.pin},
+      //   {email:addData.email},
+      //   {myImg:addData.myImg},
+      // )
+      
       const result = await axios.post(
         'http://localhost:9000/api/user/addUSerRoute',
         formData,
@@ -81,8 +92,15 @@ const AddRecord = () => {
         toast.success(result.data.msg);
       }
       if (result.data.code === 401) {
-        localStorage.clear();
-        navigate('/');
+        
+        toast.error(result.data.msg);
+      }
+      if (result.data.code === 301) {
+        
+        toast.error(result.data.msg);
+      }
+      if (result.data.code === 302) {
+        
         toast.error(result.data.msg);
       }
     }
@@ -264,9 +282,9 @@ const AddRecord = () => {
                 accept='.png, .jpg, .jpeg'
               />
               {/* {preview ? <img src={preview} alt='sdfsd' /> : ''} */}
-              {addData.myImg === null ? (
+              {/* {addData.myImg === null ? (
                 <span class='text-danger'>Please Choose Image</span>
-              ) : null}
+              ) : null} */}
             </div>
           </div>
           <button type='submit' className=' btn btn-danger'>

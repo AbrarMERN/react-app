@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerValidation } from '../../utils/Validation';
 const RegisterForm = () => {
@@ -36,9 +37,13 @@ const RegisterForm = () => {
           regInfo
         );
         console.log('Register Detail', result);
+        if (result.data.code === 302) {
+          toast.error(result.data.error);
+        }
         if (result.status === 200) {
-          // window.location.href = '/addRecord';
-          navigate('/addRecord');
+          toast.success(result.data.msg);
+          navigate('/');
+          
         }
       }
     } catch (err) {

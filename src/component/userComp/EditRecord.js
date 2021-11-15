@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import { editValidation } from '../../utils/Validation';
 
@@ -32,9 +33,7 @@ const EditRecord = () => {
       navigate('/userList');
     }
   }, [data]);
-  //   const [getEditData, getEditData] = useState('');
   const [getEditData, setGetEditData] = useState({});
-  // const [editData, seteditData] = useState('');
   const [preview, setPreview] = useState();
   const [resultMsg, setResultMsg] = useState('');
   const [errors, setErrors] = useState({});
@@ -57,6 +56,22 @@ const EditRecord = () => {
     }
     console.log('Image In Data', getEditData);
   };
+///get User By Id For Set In  Text field
+  const getRecordById = async (id) => {
+    const token = localStorage.getItem('login-token');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const result = await axios.get(
+      `http://localhost:9000/api/user/getUserByIdRoute/${id}`,
+      config
+    );
+    console.log('Result of Get Id=>', result);
+    console.log('Only Result Data=>', result.data);
+    setGetEditData(result.data.data);
+  };
+
+//update User click on submit
   const onSubmit = async (e) => {
     e.preventDefault();
     const { isvalid, errors } = editValidation(getEditData);
@@ -87,27 +102,15 @@ const EditRecord = () => {
         // { data: data }
       );
       if (result.data.code === 200) {
-        return alert(result.data.msg);
+         toast.success(result.data.msg);
+         navigate('/userList');
       }
       if (result.data.code === 400) {
-        return alert(result.data.msg);
+         toast.error(result.data.msg);
       }
     }
   };
 
-  const getRecordById = async (id) => {
-    const token = localStorage.getItem('login-token');
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const result = await axios.get(
-      `http://localhost:9000/api/user/getUserByIdRoute/${id}`,
-      config
-    );
-    console.log('Result of Get Id=>', result);
-    console.log('Only Result Data=>', result.data);
-    setGetEditData(result.data.data);
-  };
   return (
     <>
       <div class='container col-md-4'>
@@ -140,7 +143,7 @@ const EditRecord = () => {
                 type='text'
                 name='lname'
                 onChange={onchangeHandle}
-                value={getEditData.lname && getEditData.lname}
+                value={getEditData.lname}
                 placeholder='email@example.com'
                 class='form-control'
               />
@@ -157,7 +160,7 @@ const EditRecord = () => {
                 type='text'
                 name='mob'
                 onChange={onchangeHandle}
-                value={getEditData.mob && getEditData.mob}
+                value={getEditData.mob}
                 placeholder='email@example.com'
                 class='form-control'
               />
@@ -174,7 +177,7 @@ const EditRecord = () => {
                 type='text'
                 name='address'
                 onChange={onchangeHandle}
-                value={getEditData.address && getEditData.address}
+                value={getEditData.address}
                 placeholder='email@example.com'
                 class='form-control'
               />
@@ -191,7 +194,7 @@ const EditRecord = () => {
                 type='text'
                 name='city'
                 onChange={onchangeHandle}
-                value={getEditData.city && getEditData.city}
+                value={getEditData.city}
                 placeholder='email@example.com'
                 class='form-control'
               />
@@ -208,7 +211,7 @@ const EditRecord = () => {
                 type='text'
                 name='state'
                 onChange={onchangeHandle}
-                value={getEditData.state && getEditData.state}
+                value={getEditData.state}
                 placeholder='email@example.com'
                 class='form-control'
               />
@@ -225,7 +228,7 @@ const EditRecord = () => {
                 type='text'
                 name='country'
                 onChange={onchangeHandle}
-                value={getEditData.country && getEditData.country}
+                value={ getEditData.country}
                 placeholder='Country'
                 class='form-control'
               />
@@ -242,7 +245,7 @@ const EditRecord = () => {
                 type='text'
                 name='pin'
                 onChange={onchangeHandle}
-                value={getEditData.pin && getEditData.pin}
+                value={ getEditData.pin}
                 placeholder='email@example.com'
                 class='form-control'
               />
@@ -258,7 +261,7 @@ const EditRecord = () => {
                 type='text'
                 name='email'
                 onChange={onchangeHandle}
-                value={getEditData.email && getEditData.email}
+                value={ getEditData.email}
                 class='form-control'
                 id='inputPassword'
               />
