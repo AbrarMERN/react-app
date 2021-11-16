@@ -23,10 +23,10 @@ const ListUser = () => {
   const [userData, setUserData] = useState([]);
   // const [searchData, setSearchData] = useState('');
   const handlePageClick = ({ selected }) => {
-    setSkip(selected * limit);
+    setSkip((selected-1) * limit);
     setActivePage(selected);
   };
-
+///const skipIndex = (skip - 1) * limit;
   // console.log('count', count);
   const pageCount = Math.ceil(count / limit);
   // console.log('page count', pageCount);

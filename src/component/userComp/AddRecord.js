@@ -1,40 +1,62 @@
 import React from 'react';
 import axios from 'axios';
+import csc, {
+  Country,
+  State,
+  City
+} from 'country-state-city';
 import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addRecordValidation } from '../../utils/Validation';
 
+const initialState = {
+  fname: '',
+  lname: '',
+  mob: '',
+  address: '',
+  city: '',
+  state: '',
+  country: '',
+  pin: '',
+  email: '',
+  myImg: null,
+};
 const AddRecord = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (!localStorage.getItem('login-token')) {
       navigate('/');
-    } 
+    }
   }, []);
-  const initialState = {
-    fname: '',
-    lname: '',
-    mob: '',
-    address: '',
-    city: '',
-    state: '',
-    country: '',
-    pin: '',
-    email: '',
-    myImg: null,
-  };
+  const [Countries, setCountries] = useState([])
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
   const [addData, setaddData] = useState(initialState);
   const [resultMsg, setResultMsg] = useState('');
   const [preview, setPreview] = useState();
+  const [country, setCountry] = useState('');
+  const [stateData, setStateData] = useState('');
   const [errors, setErrors] = useState({});
+  const [countryCode, setCountryCode] = useState('');
+
+  const getAllCountry = () => {
+    const allCountry = Country.getAllCountries()
+    setCountries(allCountry)
+    console.log("All Country In set In satae", allCountry);
+
+  }
+  useEffect(() => {
+    getAllCountry();
+
+  }, [])
+
   const onchangeHandle = (e) => {
-    console.log(e.target.value);
     const { name, value } = e.target;
     setaddData({ ...addData, [name]: value });
   };
   const handleImageUpload = (e) => {
-    console.log('Image =>', e.target.files[0]);
     if (e.target.files[0].type.search('imgae/')) {
       setaddData({
         ...addData,
@@ -79,7 +101,7 @@ const AddRecord = () => {
       //   {email:addData.email},
       //   {myImg:addData.myImg},
       // )
-      
+
       const result = await axios.post(
         'http://localhost:9000/api/user/addUSerRoute',
         formData,
@@ -92,23 +114,65 @@ const AddRecord = () => {
         toast.success(result.data.msg);
       }
       if (result.data.code === 401) {
-        
         toast.error(result.data.msg);
       }
       if (result.data.code === 301) {
-        
         toast.error(result.data.msg);
       }
       if (result.data.code === 302) {
-        
         toast.error(result.data.msg);
       }
     }
   };
+  // const changeCountry = (event) => {
+  //   setCountry(Country.getAllCountries());
+  //   console.log('Country', country);
+  // };\
+  
+  const getState = (value) => {
+    console.log('Country Code', value);
+    setCountryCode(value);
+    const allStates = State.getStatesOfCountry(value);
+    const countryName = Country.getCountryByCode(value);
+    console.log('countryName', countryName)
+    setStates(allStates)
+    setaddData({ ...addData, country: countryName.name});
+  };
+  const getStateCity = (value) => {
+    console.log("dfsdfsd =>", value)
+    const cityList = City.getCitiesOfState(countryCode, value);
+    const stateName=State.getStateByCode(value);
+    console.log("sdasda =>", stateName)
+    setCities(cityList);
+    setaddData({ ...addData, state: stateName?.name });
+  };
+  const getCityName=(value)=>{
+    // const cityName=City.getStateByCode(value);
+    setaddData({ ...addData, city:value });
+  }
+  // useEffect(
+  //   (country) => {
+  //     //Reset country and city
+  //     //fetch all state data of that country
+  //     //store in state state
+  //     getState(country);
+  //   },
+  //   [country]
+  // );
+
+  // useEffect((state) => {
+  //   //fetch all city data of that state
+  //   //store in city state
+  // getStateCity(state)
+  // }, [state]);
   return (
     <>
+      <h1>{countryCode}</h1>
       <div className='container col-md-4'>
         <h1 className='text-warning'>Add Record</h1>
+        {console.log('All to country', addData.country)}
+        {console.log('All to State', addData.state)}
+        {console.log('All to city', addData.city)}
         <h1>{resultMsg}</h1>
         <form onSubmit={onSubmit}>
           <div className='mb-3 row'>
@@ -122,7 +186,7 @@ const AddRecord = () => {
                 placeholder='First Name'
                 className='form-control'
               />
-              {}
+              { }
               {errors && errors.fname && !addData.fname && (
                 <span className='text-danger'>{errors.fname}</span>
               )}
@@ -153,10 +217,10 @@ const AddRecord = () => {
                 name='mob'
                 onChange={onchangeHandle}
                 value={addData.mob}
-                placeholder='email@example.com'
+                placeholder='Mobile'
                 className='form-control'
               />
-              {errors && errors.mob && (
+              {errors && errors.mob && !addData.mob && (
                 <span className='text-danger'>{errors.mob}</span>
               )}
             </div>
@@ -169,16 +233,63 @@ const AddRecord = () => {
                 name='address'
                 onChange={onchangeHandle}
                 value={addData.address}
-                placeholder='email@example.com'
+                placeholder='Address'
                 className='form-control'
               />
-              {errors && errors.address && (
+              {errors && errors.address && !addData.address && (
                 <span className='text-danger'>{errors.address}</span>
               )}
             </div>
           </div>
+          <div className='mb-3 row'>
+            <label className='col-sm-2 col-form-label'>Country</label>
+            <div className='col-sm-10'>
+              <select
+                placeholder='Country'
+                className='form-control'
+                onChange={(e) => getState(e.target.value)}
+              >
+                {Country.getAllCountries().map((el) => (
+                  <option value={el.isoCode}>{el.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           <div className='mb-3 row'>
+            <label className='col-sm-2 col-form-label'>State</label>
+            <div className='col-sm-10'>
+              <select
+                placeholder='Country'
+                className='form-control'
+                onChange={(e) => getStateCity(e.target.value)}
+              // value={el.isoCode}
+              >
+                <option>Select The State</option>
+                {states.map((el) => (
+                    <option value={el.isoCode}>{el.name}</option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
+          <div className='mb-3 row'>
+            <label className='col-sm-2 col-form-label'>City</label>
+            <div className='col-sm-10'>
+              <select
+                placeholder='Country'
+                className='form-control'
+                onChange={(e) => getCityName(e.target.value)}
+              >
+                <option>Select The City</option>
+                {cities.map((el) => (
+                    <option value={el.isoCode}>{el.name}</option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
+          {/* <div className='mb-3 row'>
             <label className='col-sm-2 col-form-label'>City</label>
             <div className='col-sm-10'>
               <input
@@ -186,46 +297,14 @@ const AddRecord = () => {
                 name='city'
                 onChange={onchangeHandle}
                 value={addData.city}
-                placeholder='email@example.com'
+                placeholder='City'
                 className='form-control'
               />
-              {errors && errors.city && (
+              {errors && errors.city && !addData.city && (
                 <span className='text-danger'>{errors.city}</span>
               )}
             </div>
-          </div>
-          <div className='mb-3 row'>
-            <label className='col-sm-2 col-form-label'>State</label>
-            <div className='col-sm-10'>
-              <input
-                type='text'
-                name='state'
-                onChange={onchangeHandle}
-                value={addData.state}
-                placeholder='email@example.com'
-                className='form-control'
-              />
-              {errors && errors.state && (
-                <span className='text-danger'>{errors.state}</span>
-              )}
-            </div>
-          </div>
-          <div className='mb-3 row'>
-            <label className='col-sm-2 col-form-label'>Country</label>
-            <div className='col-sm-10'>
-              <input
-                type='text'
-                name='country'
-                onChange={onchangeHandle}
-                value={addData.country}
-                placeholder='email@example.com'
-                className='form-control'
-              />
-              {errors && errors.country && (
-                <span className='text-danger'>{errors.country}</span>
-              )}
-            </div>
-          </div>
+          </div> */}
           <div className='mb-3 row'>
             <label className='col-sm-2 col-form-label'>Pin</label>
             <div className='col-sm-10'>
@@ -234,10 +313,10 @@ const AddRecord = () => {
                 name='pin'
                 onChange={onchangeHandle}
                 value={addData.pin}
-                placeholder='email@example.com'
+                placeholder='Pin'
                 className='form-control'
               />
-              {errors && errors.pin && (
+              {errors && errors.pin && !addData.pin && (
                 <span className='text-danger'>{errors.pin}</span>
               )}
             </div>
@@ -250,10 +329,10 @@ const AddRecord = () => {
                 name='email'
                 onChange={onchangeHandle}
                 value={addData.email}
-                placeholder='email@example.com'
+                placeholder='Email'
                 class='form-control'
               />
-              {errors && errors.email && (
+              {errors && errors.email && !addData.email && (
                 <span class='text-danger'>{errors.email}</span>
               )}
             </div>
